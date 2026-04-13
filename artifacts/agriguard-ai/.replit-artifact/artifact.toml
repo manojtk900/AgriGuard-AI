@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "AgriGuard AI"
+version = "1.0.0"
+id = "artifacts/agriguard-ai"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23227
+
+[services.development]
+run = "pnpm --filter @workspace/agriguard-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/agriguard-ai", "run", "build" ]
+publicDir = "artifacts/agriguard-ai/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23227"
+BASE_PATH = "/"

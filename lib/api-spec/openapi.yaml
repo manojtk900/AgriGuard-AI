@@ -3,13 +3,21 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AgriGuard AI API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: crop
+    description: Crop prediction operations
+  - name: disease
+    description: Disease detection operations
+  - name: finance
+    description: Financial analysis operations
+  - name: subsidy
+    description: Subsidy information
 paths:
   /healthz:
     get:
@@ -24,6 +32,99 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /crop/predict:
+    post:
+      operationId: predictCrop
+      tags: [crop]
+      summary: Predict optimal crop
+      description: Predicts the best crop based on environmental conditions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CropPredictionInput"
+      responses:
+        "200":
+          description: Crop prediction result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CropPredictionResult"
+
+  /disease/detect:
+    post:
+      operationId: detectDisease
+      tags: [disease]
+      summary: Detect plant disease
+      description: Analyzes uploaded image to detect plant disease
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiseaseDetectionInput"
+      responses:
+        "200":
+          description: Disease detection result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DiseaseDetectionResult"
+
+  /finance/analyze:
+    post:
+      operationId: analyzeFinancials
+      tags: [finance]
+      summary: Analyze crop financials
+      description: Analyzes cost vs profit for a selected crop
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FinancialAnalysisInput"
+      responses:
+        "200":
+          description: Financial analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FinancialAnalysisResult"
+
+  /subsidies:
+    get:
+      operationId: getSubsidies
+      tags: [subsidy]
+      summary: Get Indian government subsidies
+      description: Returns a list of available Indian government agricultural subsidies
+      responses:
+        "200":
+          description: List of subsidies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Subsidy"
+
+  /crop/history:
+    get:
+      operationId: getCropHistory
+      tags: [crop]
+      summary: Get recent crop predictions
+      description: Returns recent crop prediction history
+      responses:
+        "200":
+          description: List of past predictions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CropPredictionRecord"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +135,231 @@ components:
       required:
         - status
 
+    CropPredictionInput:
+      type: object
+      properties:
+        temperature:
+          type: number
+          description: Temperature in Celsius
+        humidity:
+          type: number
+          description: Relative humidity percentage
+        ph:
+          type: number
+          description: Soil pH level
+        rainfall:
+          type: number
+          description: Rainfall in mm
+      required:
+        - temperature
+        - humidity
+        - ph
+        - rainfall
+
+    CropPredictionResult:
+      type: object
+      properties:
+        crop:
+          type: string
+          description: Predicted crop name
+        confidence:
+          type: number
+          description: Confidence percentage
+        riskLevel:
+          type: string
+          enum: [Low, Medium, High]
+          description: Risk assessment level
+        explanation:
+          type: string
+          description: Human-readable explanation of why this crop was chosen
+        alternativeCrops:
+          type: array
+          items:
+            type: string
+          description: Other suitable crops for these conditions
+        tips:
+          type: array
+          items:
+            type: string
+          description: Farming tips for this crop
+      required:
+        - crop
+        - confidence
+        - riskLevel
+        - explanation
+        - alternativeCrops
+        - tips
+
+    DiseaseDetectionInput:
+      type: object
+      properties:
+        imageBase64:
+          type: string
+          description: Base64 encoded image data
+        cropType:
+          type: string
+          description: Type of crop in the image
+      required:
+        - imageBase64
+
+    DiseaseDetectionResult:
+      type: object
+      properties:
+        disease:
+          type: string
+          description: Detected disease name
+        severity:
+          type: string
+          enum: [Healthy, Mild, Moderate, Severe]
+        confidence:
+          type: number
+          description: Detection confidence percentage
+        description:
+          type: string
+          description: Description of the disease
+        treatment:
+          type: string
+          description: Recommended treatment
+        prevention:
+          type: string
+          description: Prevention tips
+      required:
+        - disease
+        - severity
+        - confidence
+        - description
+        - treatment
+        - prevention
+
+    FinancialAnalysisInput:
+      type: object
+      properties:
+        crop:
+          type: string
+          description: Crop name
+        costPerAcre:
+          type: number
+          description: Input cost per acre in INR
+        acres:
+          type: number
+          description: Number of acres
+        season:
+          type: string
+          description: Growing season
+      required:
+        - crop
+        - costPerAcre
+        - acres
+
+    FinancialAnalysisResult:
+      type: object
+      properties:
+        totalCost:
+          type: number
+          description: Total input cost in INR
+        expectedYield:
+          type: number
+          description: Expected yield in quintals
+        marketPrice:
+          type: number
+          description: Current market price per quintal in INR
+        grossRevenue:
+          type: number
+          description: Expected gross revenue in INR
+        netProfit:
+          type: number
+          description: Estimated net profit in INR
+        roi:
+          type: number
+          description: Return on investment percentage
+        breakEvenYield:
+          type: number
+          description: Minimum yield needed to break even
+        monthlyData:
+          type: array
+          items:
+            $ref: "#/components/schemas/MonthlyFinancialData"
+          description: Month-by-month cost breakdown
+      required:
+        - totalCost
+        - expectedYield
+        - marketPrice
+        - grossRevenue
+        - netProfit
+        - roi
+        - breakEvenYield
+        - monthlyData
+
+    MonthlyFinancialData:
+      type: object
+      properties:
+        month:
+          type: string
+        cost:
+          type: number
+        revenue:
+          type: number
+      required:
+        - month
+        - cost
+        - revenue
+
+    Subsidy:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        ministry:
+          type: string
+        description:
+          type: string
+        amount:
+          type: string
+        eligibility:
+          type: string
+        applicationUrl:
+          type: string
+        category:
+          type: string
+          enum: [Income Support, Irrigation, Insurance, Credit, Equipment, Input Subsidy]
+      required:
+        - id
+        - name
+        - ministry
+        - description
+        - amount
+        - eligibility
+        - category
+
+    CropPredictionRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        crop:
+          type: string
+        riskLevel:
+          type: string
+          enum: [Low, Medium, High]
+        temperature:
+          type: number
+        humidity:
+          type: number
+        ph:
+          type: number
+        rainfall:
+          type: number
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - crop
+        - riskLevel
+        - temperature
+        - humidity
+        - ph
+        - rainfall
+        - createdAt
