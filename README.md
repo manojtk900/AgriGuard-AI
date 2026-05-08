@@ -1,4 +1,4 @@
-# 🌾 AgriGuard AI
+# 🌾 AgriGuard AI by Manoj TK 
 
 ### AI-Based Data-Driven Predictive Farming System with Explainable AI and Financial Insights
 
